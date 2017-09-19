@@ -16,11 +16,7 @@
           </form>
         </div>
       </div>
-      {% if answer == "leaving" %}
-      <h1 class="text-center text-danger">Employee is leaving</h1>
-      {% elif answer == "staying" %}
-      <h1 class="text-center text-success">Employee is staying</h1>
-      {% endif %}
+      <h1 class="text-center">{{proba_left}}% probability of leaving</h1>
 
     </div>
   </div>

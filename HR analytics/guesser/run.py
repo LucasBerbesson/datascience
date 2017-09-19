@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 from wtforms import Form, BooleanField, IntegerField, SelectField,FloatField
 
-clf = joblib.load('flask_model.pkl')
+clf = joblib.load('rf_model.pkl')
 
 class HRForm(Form):
     satisfaction_level = FloatField('Satisfaction level',render_kw={"placeholder": "between 0 and 1"})
@@ -24,7 +24,7 @@ class HRForm(Form):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     form = HRForm(request.form)
-    answer = None
+    proba_left = None
     if request.method == "POST" and form.validate():
         salary = [0,'LOW','MEDIUM','HIGH'].index(form.salary.data)
         satisfaction = float(form.satisfaction_level.data)
@@ -32,13 +32,8 @@ def index():
         hours = float(form.average_montly_hours.data)
         promotion = int(form.promotion_last_5years.data)
         employee = np.array([satisfaction,hours,promotion,salary,number_project]).reshape(1,-1)
-        leaving = clf.predict(employee)
-        if leaving[0]:
-            answer = "leaving"
-        else:
-            answer = "staying"
-
-    return render_template("index.html", title='Home', form=form, answer=answer)
+        proba_left = round(clf.predict_proba(employee)[0][1]*100,2)
+    return render_template("index.html", title='Home', form=form, proba_left=proba_left)
 
 
 if __name__ == '__main__':
